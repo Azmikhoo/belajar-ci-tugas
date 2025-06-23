@@ -36,7 +36,12 @@
         }
         ?>
    
-
+        <li class="nav-item">
+            <a class="nav-link <?php echo (uri_string() == 'profile') ? "" : "collapsed" ?>" href="profile">
+                <i class="bi bi-person"></i>
+                <span>Profile</span>
+            </a>
+        </li><!-- End Profile Nav -->
     <li class="nav-item">
         <a class="nav-link <?= (uri_string() == 'faq') ? '' : 'collapsed' ?>" href="<?= base_url('faq') ?>">
             <i class="bi bi-question-circle"></i>
@@ -44,12 +49,7 @@
         </a>
     </li>
 
-    <li class="nav-item">
-        <a class="nav-link <?= (uri_string() == 'profile') ? '' : 'collapsed' ?>" href="<?= base_url('profile') ?>">
-            <i class="bi bi-person"></i>
-            <span>Profile</span>
-        </a>
-    </li>
+
 
     <li class="nav-item">
         <a class="nav-link <?= (uri_string() == 'contact') ? '' : 'collapsed' ?>" href="<?= base_url('contact') ?>">
