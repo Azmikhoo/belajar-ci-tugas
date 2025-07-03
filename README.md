@@ -1,68 +1,112 @@
-# CodeIgniter 4 Application Starter
+Proyek "Toko" adalah aplikasi E-Commerce berbasis CodeIgniter 4 yang dikembangkan sebagai tugas Ujian Akhir Semester (UAS) mata kuliah Pemrograman Web Lanjut. Aplikasi ini mengintegrasikan berbagai fungsionalitas inti sebuah toko online, mulai dari manajemen produk dan transaksi, hingga fitur diskon dinamis dan konsumsi webservice eksternal.
 
-## What is CodeIgniter?
+Berikut adalah rangkuman fitur dan detail proyek:
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+Fitur Utama Aplikasi
+Pengelolaan Pengguna & Autentikasi:
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+Mendukung peran pengguna Admin dan Guest dengan sistem login/logout berbasis sesi.
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+Halaman utama (Dashboard) menampilkan daftar produk.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
 
-## Installation & updates
+Notifikasi Diskon Dinamis: Header website otomatis menampilkan informasi diskon harian yang berlaku, diproses melalui BaseController untuk memastikan ketersediaan data di setiap halaman.
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+Manajemen Data:
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+Produk & Kategori: Admin dapat melakukan operasi CRUD (Create, Read, Update, Delete) pada data produk dan kategori melalui antarmuka modal.
 
-## Setup
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+Diskon (Admin Saja): Terdapat menu khusus untuk admin mengelola diskon harian, termasuk validasi untuk mencegah duplikasi diskon pada tanggal yang sama dan input tanggal yang readonly saat mengedit.
 
-## Important Change with index.php
+Transaksi & Keranjang Belanja:
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Keranjang Belanja: Pengguna dapat menambah, mengubah kuantitas, menghapus, atau mengosongkan item di keranjang.
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
 
-**Please** read the user guide for a better explanation of how CI4 works!
+Diskon Otomatis: Diskon yang berlaku secara otomatis diterapkan pada harga produk saat ditambahkan ke keranjang.
 
-## Repository Management
+Checkout & Ongkos Kirim: Proses checkout terintegrasi dengan API RajaOngkir untuk perhitungan ongkos kirim dinamis.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Penyimpanan Transaksi: Detail transaksi, termasuk harga diskon dan ongkir, disimpan ke database.
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
 
-## Server Requirements
+Riwayat Transaksi: Pengguna dapat melihat riwayat dan mengubah status transaksi mereka di halaman profil.
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+Webservice & Dashboard Eksternal:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+API Transaksi: Aplikasi menyediakan endpoint API (/api/uas-report) yang mengeluarkan data semua transaksi dalam format JSON, termasuk total jumlah item per transaksi.
 
-Additionally, make sure that the following extensions are enabled in your PHP:
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+Dashboard Sederhana Eksternal: Terdapat aplikasi dashboard terpisah (berada di public/dashboard-toko) yang mengkonsumsi data dari API ini dan menampilkannya dalam tabel.
+
+Kebutuhan Sistem & Instalasi
+Persyaratan Sistem:
+
+PHP 7.4+
+
+Composer
+
+Web Server (Apache/Nginx atau php spark serve)
+
+MySQL/MariaDB
+
+Ekstensi PHP 
+
+intl dan curl.
+
+Langkah Instalasi:
+
+Clone repositori GitHub proyek.
+
+Masuk ke direktori proyek.
+
+Jalankan composer install untuk menginstal dependensi.
+
+Salin 
+
+env menjadi .env dan konfigurasikan CI_ENVIRONMENT, app.baseURL, kredensial database (database.default.hostname, database.default.database, database.default.username, database.default.password), dan COST_KEY (API key RajaOngkir Anda).
+
+Jalankan 
+
+php spark migrate untuk membuat tabel database.
+
+Jalankan 
+
+php spark db:seed UserSeeder dan php spark db:seed DiskonSeeder untuk mengisi data awal.
+
+Jalankan 
+
+php spark serve untuk memulai server pengembangan dan akses aplikasi di http://localhost:8080.
+
+Struktur Proyek
+Proyek ini mengikuti arsitektur Model-View-Controller (MVC) CodeIgniter 4:
+
+app/: Berisi kode inti aplikasi.
+
+Controllers/: Mengelola permintaan pengguna, berkomunikasi dengan Model, dan mengirim data ke View. Contoh: 
+
+BaseController (untuk diskon header), HomeController, AuthController, ProdukController, TransaksiController, ApiController (untuk webservice), dan Admin/Diskon.php (untuk manajemen diskon admin).
+
+
+Models/: Mengelola interaksi dengan database, seperti ProductModel, TransactionModel (dengan metode getTransaksiForApi() untuk data jumlah item), dll.
+
+
+Views/: Berisi semua file UI (HTML + PHP), termasuk layout.php, komponen seperti header.php dan sidebar.php, serta view spesifik halaman dan sub-direktori admin/diskon/.
+
+
+Database/: Mengelola skema tabel (Migrations/) dan data awal (Seeds/).
+
+
+Filters/: Berisi kelas filter seperti AuthFilter (untuk memeriksa login) dan RedirectFilter (untuk mencegah akses halaman login jika sudah login).
+
+
+Config/: Direktori konfigurasi CodeIgniter, termasuk Routes.php (mendefinisikan URL dan menerapkan filter).
+
+public/: Direktori yang dapat diakses publik. Berisi 
+
+index.php (titik masuk aplikasi), aset (CSS, JS, gambar), dan folder dashboard-toko/ untuk aplikasi dashboard eksternal.
+
+
+.env: File konfigurasi lingkungan lokal, tidak boleh di-commit ke Git karena berisi informasi sensitif.

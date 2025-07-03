@@ -5,7 +5,9 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
+
 use App\Models\UserModel;
+use App\Models\DiskonModel;
 
 class AuthController extends BaseController
 {
@@ -43,7 +45,15 @@ class AuthController extends BaseController
                             'isLoggedIn' => TRUE
                         ]);
 
-                       
+                    $diskonModel = new DiskonModel();
+                        $today = date('Y-m-d');
+                        $diskon = $diskonModel->where('tanggal', $today)->first();
+
+                        if ($diskon) {
+                            session()->set('diskon_nominal', $diskon['nominal']);
+                        } else {
+                            session()->remove('diskon_nominal'); // hapus jika tidak ada
+                        }
                         return redirect()->to('contact');  
                     } else {
                     

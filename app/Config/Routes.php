@@ -51,8 +51,13 @@ $routes->get('get-cost', 'TransaksiController::getCost', ['filter' => 'auth']);
 
 $routes->get('faq', 'Home::faq', ['filter' => 'auth']);
 $routes->get('profile', 'Home::profile', ['filter' => 'auth']);
-$routes->get('contact', 'Home::contact', ['filter' => 'auth']);
+#$routes->get('contact', 'Home::contact', ['filter' => 'auth']);
+$routes->get('contact','ContactController::index', ['filter' => 'auth']);
 $routes->resource('api', ['controller' => 'apiController']);
 
+$routes->get('diskon', 'DiskonController::index', ['filter' => 'authAdmin']);
+$routes->post('diskon/save', 'DiskonController::save', ['filter' => 'authAdmin']);
+$routes->get('diskon/delete/(:num)', 'DiskonController::delete/$1', ['filter' => 'authAdmin']);
 
-
+$routes->get('pembelian', 'PembelianController::index', ['filter' => 'auth']);
+$routes->get('pembelian/ubah/(:num)', 'PembelianController::ubahStatus/$1', ['filter' => 'auth']);

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers;
+
 use App\Models\TransactionModel;
 use App\Models\TransactionDetailModel;
 
@@ -11,6 +12,7 @@ class TransaksiController extends BaseController
     protected $apiKey;
     protected $transaction;
     protected $transaction_detail;
+    private $discount;
 
     function __construct()
     {
@@ -19,8 +21,9 @@ class TransaksiController extends BaseController
         $this->cart = \Config\Services::cart();
         $this->client = new \GuzzleHttp\Client();
         $this->apiKey = env('COST_KEY');
-        $this->transaction = new TransactionModel();
-        $this->transaction_detail = new TransactionDetailModel();
+        $this->transaction = new TransactionModel;
+        $this->transaction_detail = new TransactionDetailModel;
+        $this->discount = (float) session()->get('diskon_nominal');
     }
 
     public function index()
@@ -35,7 +38,7 @@ class TransaksiController extends BaseController
         $this->cart->insert(array(
             'id'        => $this->request->getPost('id'),
             'qty'       => 1,
-            'price'     => $this->request->getPost('harga'),
+            'price'     => (float) $this->request->getPost('harga') - $this->discount,
             'name'      => $this->request->getPost('nama'),
             'options'   => array('foto' => $this->request->getPost('foto'))
         ));
@@ -85,29 +88,32 @@ class TransaksiController extends BaseController
         $search = $this->request->getGet('search');
 
         $response = $this->client->request(
-            'GET', 
-            'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search='.$search.'&limit=50', [
+            'GET',
+            'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search=' . $search . '&limit=50',
+            [
                 'headers' => [
                     'accept' => 'application/json',
                     'key' => $this->apiKey,
                 ],
-            ]
+            ],
         );
 
-        $body = json_decode($response->getBody(), true); 
+
+        $body = json_decode($response->getBody(), true);
         return $this->response->setJSON($body['data']);
     }
 
     public function getCost()
-    { 
+    {
         //ID lokasi yang dikirimkan dari halaman checkout
         $destination = $this->request->getGet('destination');
 
         //parameter daerah asal pengiriman, berat produk, dan kurir dibuat statis
         //valuenya => 64999 : PEDURUNGAN TENGAH , 1000 gram, dan JNE
         $response = $this->client->request(
-            'POST', 
-            'https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+            'POST',
+            'https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost',
+            [
                 'multipart' => [
                     [
                         'name' => 'origin',
@@ -133,13 +139,13 @@ class TransaksiController extends BaseController
             ]
         );
 
-        $body = json_decode($response->getBody(), true); 
+        $body = json_decode($response->getBody(), true);
         return $this->response->setJSON($body['data']);
     }
 
     public function buy()
     {
-        if ($this->request->getPost()) { 
+        if ($this->request->getPost()) {
             $dataForm = [
                 'username' => $this->request->getPost('username'),
                 'total_harga' => $this->request->getPost('total_harga'),
@@ -159,8 +165,8 @@ class TransaksiController extends BaseController
                     'transaction_id' => $last_insert_id,
                     'product_id' => $value['id'],
                     'jumlah' => $value['qty'],
-                    'diskon' => 0,
-                    'subtotal_harga' => $value['qty'] * $value['price'],
+                    'diskon' => $this->discount,
+                    'subtotal_harga' => ($value['qty'] * $value['price']),
                     'created_at' => date("Y-m-d H:i:s"),
                     'updated_at' => date("Y-m-d H:i:s")
                 ];
@@ -169,7 +175,7 @@ class TransaksiController extends BaseController
             }
 
             $this->cart->destroy();
-    
+
             return redirect()->to(base_url());
         }
     }
